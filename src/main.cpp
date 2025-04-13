@@ -83,3 +83,17 @@ int eval(const std::string& post) {
 
   return stack.top();
 }
+
+int main() {
+  std::string expr;
+  std::cout << "Введите инфиксное выражение: ";
+  std::getline(std::cin, expr);
+
+  std::string post = infx2pstfx(expr);
+  std::cout << "Постфиксная форма: " << post << "\n";
+
+  int result = eval(post);
+  std::cout << "Результат вычисления: " << result << "\n";
+
+  return 0;
+}
