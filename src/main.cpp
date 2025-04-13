@@ -14,53 +14,47 @@ int precedence(char op) {
 std::string infx2pstfx(const std::string& inf) {
     TStack<char, 100> stack;
     std::string postfix;
-    bool readingNumber = false;
+    bool prevWasDigit = false;
 
-    for (char c : inf) {
-        if (isspace(c)) {
-            continue;
-        }
+    for (size_t i = 0; i < inf.size(); ++i) {
+        char c = inf[i];
+
+        if (isspace(c)) continue;
 
         if (isdigit(c)) {
-            if (!readingNumber && !postfix.empty()) {
-                postfix += ' ';
+            if (prevWasDigit) {
+                postfix += c;
+            } else {
+                if (!postfix.empty()) postfix += ' ';
+                postfix += c;
             }
-            postfix += c;
-            readingNumber = true;
+            prevWasDigit = true;
         } else {
-            if (readingNumber) {
-                postfix += ' ';
-                readingNumber = false;
-            }
+            prevWasDigit = false;
 
             if (c == '(') {
                 stack.push(c);
             } else if (c == ')') {
                 while (!stack.isEmpty() && stack.peek() != '(') {
-                    postfix += stack.pop();
                     postfix += ' ';
+                    postfix += stack.pop();
                 }
-                stack.pop(); // Remove '(' from stack
+                if (!stack.isEmpty()) stack.pop();
             } else {
                 while (!stack.isEmpty() && stack.peek() != '(' && 
                        precedence(c) <= precedence(stack.peek())) {
-                    postfix += stack.pop();
                     postfix += ' ';
+                    postfix += stack.pop();
                 }
+                postfix += ' ';
                 stack.push(c);
             }
         }
     }
 
-    // Add remaining operators
     while (!stack.isEmpty()) {
-        postfix += stack.pop();
         postfix += ' ';
-    }
-
-    // Remove trailing space if any
-    if (!postfix.empty() && postfix.back() == ' ') {
-        postfix.pop_back();
+        postfix += stack.pop();
     }
 
     return postfix;
@@ -72,17 +66,24 @@ int eval(const std::string& post) {
     std::string token;
 
     while (iss >> token) {
-        if (isdigit(token[0]) || (token[0] == '-' && token.size() > 1)) {
-            stack.push(std::stoi(token));
+        if (token == "+") {
+            int b = stack.pop();
+            int a = stack.pop();
+            stack.push(a + b);
+        } else if (token == "-") {
+            int b = stack.pop();
+            int a = stack.pop();
+            stack.push(a - b);
+        } else if (token == "*") {
+            int b = stack.pop();
+            int a = stack.pop();
+            stack.push(a * b);
+        } else if (token == "/") {
+            int b = stack.pop();
+            int a = stack.pop();
+            stack.push(a / b);
         } else {
-            int right = stack.pop();
-            int left = stack.pop();
-            switch (token[0]) {
-                case '+': stack.push(left + right); break;
-                case '-': stack.push(left - right); break;
-                case '*': stack.push(left * right); break;
-                case '/': stack.push(left / right); break;
-            }
+            stack.push(std::stoi(token));
         }
     }
 
