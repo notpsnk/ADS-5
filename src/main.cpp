@@ -6,83 +6,87 @@
 #include "tstack.h"
 
 int precedence(char op) {
-  if (op == '+' || op == '-') return 1;
-  if (op == '*' || op == '/') return 2;
-  return 0;
+    if (op == '+' || op == '-') return 1;
+    if (op == '*' || op == '/') return 2;
+    return 0;
 }
 
 std::string infx2pstfx(const std::string& inf) {
-  TStack<char, 100> stack;
-  std::string postfix;
-  bool prevWasDigit = false;
+    TStack<char, 100> stack;
+    std::string postfix;
+    bool readingNumber = false;
 
-  for (size_t i = 0; i < inf.size(); ++i) {
-    char c = inf[i];
+    for (char c : inf) {
+        if (isspace(c)) {
+            continue;
+        }
 
-    if (isspace(c)) {
-      continue;
+        if (isdigit(c)) {
+            if (!readingNumber && !postfix.empty()) {
+                postfix += ' ';
+            }
+            postfix += c;
+            readingNumber = true;
+        } else {
+            if (readingNumber) {
+                postfix += ' ';
+                readingNumber = false;
+            }
+
+            if (c == '(') {
+                stack.push(c);
+            } else if (c == ')') {
+                while (!stack.isEmpty() && stack.peek() != '(') {
+                    postfix += stack.pop();
+                    postfix += ' ';
+                }
+                stack.pop(); // Remove '(' from stack
+            } else {
+                while (!stack.isEmpty() && stack.peek() != '(' && 
+                       precedence(c) <= precedence(stack.peek())) {
+                    postfix += stack.pop();
+                    postfix += ' ';
+                }
+                stack.push(c);
+            }
+        }
     }
 
-    if (isdigit(c)) {
-      if (prevWasDigit) {
-        postfix += c;
-      } else {
-        if (!postfix.empty()) {
-          postfix += ' ';
-        }
-        postfix += c;
-      }
-      prevWasDigit = true;
-    } else {
-      prevWasDigit = false;
-
-      if (c == '(') {
-        stack.push(c);
-      } else if (c == ')') {
-        while (!stack.isEmpty() && stack.peek() != '(') {
-          postfix += ' ';
-          postfix += stack.pop();
-        }
-        stack.pop();
-      } else {
-        while (!stack.isEmpty() && precedence(c) <= precedence(stack.peek())) {
-          postfix += ' ';
-          postfix += stack.pop();
-        }
-        stack.push(c);
-      }
+    // Add remaining operators
+    while (!stack.isEmpty()) {
+        postfix += stack.pop();
+        postfix += ' ';
     }
-  }
 
-  while (!stack.isEmpty()) {
-    postfix += ' ';
-    postfix += stack.pop();
-  }
+    // Remove trailing space if any
+    if (!postfix.empty() && postfix.back() == ' ') {
+        postfix.pop_back();
+    }
 
-  return postfix;
+    return postfix;
 }
 
 int eval(const std::string& post) {
-  TStack<int, 100> stack;
-  std::istringstream iss(post);
-  std::string token;
+    TStack<int, 100> stack;
+    std::istringstream iss(post);
+    std::string token;
 
-  while (iss >> token) {
-    if (isdigit(token[0])) {
-      stack.push(std::stoi(token));
-    } else {
-      int right = stack.pop();
-      int left = stack.pop();
-      switch (token[0]) {
-        case '+': stack.push(left + right); break;
-        case '-': stack.push(left - right); break;
-        case '*': stack.push(left * right); break;
-        case '/': stack.push(left / right); break;
-      }
+    while (iss >> token) {
+        if (isdigit(token[0]) || (token[0] == '-' && token.size() > 1)) {
+            stack.push(std::stoi(token));
+        } else {
+            int right = stack.pop();
+            int left = stack.pop();
+            switch (token[0]) {
+                case '+': stack.push(left + right); break;
+                case '-': stack.push(left - right); break;
+                case '*': stack.push(left * right); break;
+                case '/': stack.push(left / right); break;
+            }
+        }
     }
-  }
 
-  return stack.pop();
+    return stack.isEmpty() ? 0 : stack.pop();
 }
 
 int main() {
