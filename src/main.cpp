@@ -83,3 +83,11 @@ int eval(const std::string& post) {
 
   return stack.pop();
 }
+
+int main() {
+  std::string infix;
+  std::getline(std::cin, infix);
+  std::string postfix = infx2pstfx(infix);
+  std::cout << postfix << "\n" << eval(postfix) << "\n";
+  return 0;
+}
