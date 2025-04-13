@@ -14,19 +14,17 @@ int precedence(char op) {
 std::string infx2pstfx(const std::string& inf) {
   std::string output;
   TStack<char, 100> stack;
-  size_t i = 0;
 
-  while (i < inf.size()) {
+  for (size_t i = 0; i < inf.length(); ++i) {
     char ch = inf[i];
 
     if (isdigit(ch)) {
-      std::string number;
-      while (i < inf.size() && isdigit(inf[i])) {
-        number += inf[i];
+      std::string num(1, ch);
+      while (i + 1 < inf.length() && isdigit(inf[i + 1])) {
         ++i;
+        num += inf[i];
       }
-      output += number + ' ';
-      continue;
+      output += num + ' ';
     } else if (ch == '(') {
       stack.push(ch);
     } else if (ch == ')') {
@@ -44,8 +42,6 @@ std::string infx2pstfx(const std::string& inf) {
       }
       stack.push(ch);
     }
-
-    ++i;
   }
 
   while (!stack.isEmpty()) {
