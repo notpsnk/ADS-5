@@ -15,16 +15,16 @@ std::string infx2pstfx(const std::string& inf) {
   std::string output;
   TStack<char, 100> stack;
 
-  for (size_t i = 0; i < inf.length(); ++i) {
+  for (size_t i = 0; i < inf.size(); ++i) {
     char ch = inf[i];
 
     if (isdigit(ch)) {
-      std::string num(1, ch);
-      while (i + 1 < inf.length() && isdigit(inf[i + 1])) {
+      std::string number(1, ch);
+      while (i + 1 < inf.size() && isdigit(inf[i + 1])) {
         ++i;
-        num += inf[i];
+        number += inf[i];
       }
-      output += num + ' ';
+      output += number + ' ';
     } else if (ch == '(') {
       stack.push(ch);
     } else if (ch == ')') {
@@ -33,7 +33,7 @@ std::string infx2pstfx(const std::string& inf) {
         output += ' ';
         stack.pop();
       }
-      if (!stack.isEmpty()) stack.pop();
+      if (!stack.isEmpty()) stack.pop(); // remove '('
     } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
       while (!stack.isEmpty() && precedence(stack.top()) >= precedence(ch)) {
         output += stack.top();
