@@ -1,8 +1,8 @@
 // Copyright 2021 NNTU-CS
 #include <iostream>
 #include <string>
-#include <cctype>
 #include <sstream>
+#include <cctype>
 #include "tstack.h"
 
 int precedence(char op) {
@@ -10,13 +10,10 @@ int precedence(char op) {
   if (op == '*' || op == '/') return 2;
   return 0;
 }
-int main() {
-  std::string infix;
-  std::cout << "Введите инфиксное выражение: \n";
-  std::getline(std::cin, infix);
-  std::string postfix;
-  TStack<char, 100> opStack;
-  std::istringstream in(infix);
+std::string infx2pstfx(const std::string& inf) {
+  std::string output;
+  TStack<char, 100> stack;
+  std::istringstream in(inf);
   char ch;
   while (in >> std::noskipws >> ch) {
     if (isdigit(ch)) {
@@ -26,51 +23,67 @@ int main() {
         in >> next;
         number += next;
       }
-      postfix += number + ' ';
+      output += number + ' ';
     } else if (ch == '(') {
-      opStack.push(ch);
+      stack.push(ch);
     } else if (ch == ')') {
-      while (!opStack.isEmpty() && opStack.top() != '(') {
-        postfix += opStack.top();
-        postfix += ' ';
-        opStack.pop();
+      while (!stack.isEmpty() && stack.top() != '(') {
+        output += stack.top();
+        output += ' ';
+        stack.pop();
       }
-      if (!opStack.isEmpty()) opStack.pop();
+      if (!stack.isEmpty()) stack.pop();
     } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
-      while (!opStack.isEmpty() &&
-            precedence(opStack.top()) >= precedence(ch)) {
-        postfix += opStack.top();
-        postfix += ' ';
-        opStack.pop();
+      while (!stack.isEmpty() && precedence(stack.top()) >= precedence(ch)) {
+        output += stack.top();
+        output += ' ';
+        stack.pop();
       }
-      opStack.push(ch);
+      stack.push(ch);
     }
   }
-  while (!opStack.isEmpty()) {
-    postfix += opStack.top();
-    postfix += ' ';
-    opStack.pop();
+  while (!stack.isEmpty()) {
+    output += stack.top();
+    output += ' ';
+    stack.pop();
   }
-  std::cout << "Постфиксная форма: " << postfix << "\n";
-  TStack<int, 100> valStack;
-  std::istringstream postStream(postfix);
+
+  return output;
+}
+int eval(const std::string& post) {
+  TStack<int, 100> stack;
+  std::istringstream in(post);
   std::string token;
-  while (postStream >> token) {
-    if (isdigit(token[0])) {
-      valStack.push(std::stoi(token));
+  while (in >> token) {
+    if (isdigit(token[0]) || (token[0] == '-' && token.length() > 1)) {
+      stack.push(std::stoi(token));
     } else {
-      int b = valStack.top(); valStack.pop();
-      int a = valStack.top(); valStack.pop();
+      int b = stack.top(); stack.pop();
+      int a = stack.top(); stack.pop();
       int result = 0;
+
       switch (token[0]) {
         case '+': result = a + b; break;
         case '-': result = a - b; break;
         case '*': result = a * b; break;
         case '/': result = a / b; break;
       }
-      valStack.push(result);
+
+      stack.push(result);
     }
   }
-  std::cout << "Результат вычисления: " << valStack.top() << "\n";
+  return stack.top();
+}
+int main() {
+  std::string expr;
+  std::cout << "Введите инфиксное выражение: ";
+  std::getline(std::cin, expr);
+
+  std::string post = infx2pstfx(expr);
+  std::cout << "Постфиксная форма: " << post << "\n";
+
+  int result = eval(post);
+  std::cout << "Результат вычисления: " << result << "\n";
+
   return 0;
 }
