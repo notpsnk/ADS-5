@@ -5,65 +5,72 @@
 #include <cctype>
 #include "tstack.h"
 
-int precedence(char op) {
-  if (op == '+' || op == '-') return 1;
-  if (op == '*' || op == '/') return 2;
-  return 0;
-}
+int main() {
+  std::string inf;
+  std::getline(std::cin, inf);
 
-std::string infx2pstfx(const std::string& inf) {
-  std::string output;
-  TStack<char, 100> stack;
+  std::string post;
+  TStack<char, 100> opStack;
+  size_t i = 0;
 
-  for (size_t i = 0; i < inf.size(); ++i) {
+  while (i < inf.length()) {
     char ch = inf[i];
 
     if (isdigit(ch)) {
-      std::string number(1, ch);
-      while (i + 1 < inf.size() && isdigit(inf[i + 1])) {
+      std::string num;
+      while (i < inf.length() && isdigit(inf[i])) {
+        num += inf[i];
         ++i;
-        number += inf[i];
       }
-      output += number + ' ';
-    } else if (ch == '(') {
-      stack.push(ch);
-    } else if (ch == ')') {
-      while (!stack.isEmpty() && stack.top() != '(') {
-        output += stack.top();
-        output += ' ';
-        stack.pop();
-      }
-      if (!stack.isEmpty()) stack.pop(); // remove '('
-    } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
-      while (!stack.isEmpty() && precedence(stack.top()) >= precedence(ch)) {
-        output += stack.top();
-        output += ' ';
-        stack.pop();
-      }
-      stack.push(ch);
+      post += num + ' ';
+      continue;
     }
+
+    if (ch == '(') {
+      opStack.push(ch);
+    } else if (ch == ')') {
+      while (!opStack.isEmpty() && opStack.top() != '(') {
+        post += opStack.top();
+        post += ' ';
+        opStack.pop();
+      }
+      if (!opStack.isEmpty()) opStack.pop(); // убираем '('
+    } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
+      auto precedence = [](char op) {
+        if (op == '+' || op == '-') return 1;
+        if (op == '*' || op == '/') return 2;
+        return 0;
+      };
+
+      while (!opStack.isEmpty() && precedence(opStack.top()) >= precedence(ch)) {
+        post += opStack.top();
+        post += ' ';
+        opStack.pop();
+      }
+      opStack.push(ch);
+    }
+
+    ++i;
   }
 
-  while (!stack.isEmpty()) {
-    output += stack.top();
-    output += ' ';
-    stack.pop();
+  while (!opStack.isEmpty()) {
+    post += opStack.top();
+    post += ' ';
+    opStack.pop();
   }
 
-  return output;
-}
+  std::cout << post << std::endl;
 
-int eval(const std::string& post) {
-  TStack<int, 100> stack;
   std::istringstream in(post);
   std::string token;
+  TStack<int, 100> valStack;
 
   while (in >> token) {
-    if (isdigit(token[0]) || (token[0] == '-' && token.length() > 1)) {
-      stack.push(std::stoi(token));
+    if (isdigit(token[0]) || (token[0] == '-' && token.size() > 1)) {
+      valStack.push(std::stoi(token));
     } else {
-      int b = stack.top(); stack.pop();
-      int a = stack.top(); stack.pop();
+      int b = valStack.top(); valStack.pop();
+      int a = valStack.top(); valStack.pop();
       int result = 0;
 
       switch (token[0]) {
@@ -73,23 +80,10 @@ int eval(const std::string& post) {
         case '/': result = a / b; break;
       }
 
-      stack.push(result);
+      valStack.push(result);
     }
   }
 
-  return stack.top();
-}
-
-int main() {
-  std::string expr;
-  std::cout << "Введите инфиксное выражение: ";
-  std::getline(std::cin, expr);
-
-  std::string post = infx2pstfx(expr);
-  std::cout << "Постфиксная форма: " << post << "\n";
-
-  int result = eval(post);
-  std::cout << "Результат вычисления: " << result << "\n";
-
+  std::cout << valStack.top() << std::endl;
   return 0;
 }
