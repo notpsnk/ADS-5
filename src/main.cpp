@@ -10,20 +10,23 @@ int precedence(char op) {
   if (op == '*' || op == '/') return 2;
   return 0;
 }
+
 std::string infx2pstfx(const std::string& inf) {
   std::string output;
   TStack<char, 100> stack;
-  std::istringstream in(inf);
-  char ch;
-  while (in >> std::noskipws >> ch) {
+  size_t i = 0;
+
+  while (i < inf.size()) {
+    char ch = inf[i];
+
     if (isdigit(ch)) {
-      std::string number(1, ch);
-      while (in.peek() != EOF && isdigit(in.peek())) {
-        char next;
-        in >> next;
-        number += next;
+      std::string number;
+      while (i < inf.size() && isdigit(inf[i])) {
+        number += inf[i];
+        ++i;
       }
       output += number + ' ';
+      continue;
     } else if (ch == '(') {
       stack.push(ch);
     } else if (ch == ')') {
@@ -32,7 +35,7 @@ std::string infx2pstfx(const std::string& inf) {
         output += ' ';
         stack.pop();
       }
-      if (!stack.isEmpty()) stack.pop();
+      if (!stack.isEmpty()) stack.pop(); 
     } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
       while (!stack.isEmpty() && precedence(stack.top()) >= precedence(ch)) {
         output += stack.top();
@@ -41,7 +44,10 @@ std::string infx2pstfx(const std::string& inf) {
       }
       stack.push(ch);
     }
+
+    ++i;
   }
+
   while (!stack.isEmpty()) {
     output += stack.top();
     output += ' ';
@@ -50,10 +56,12 @@ std::string infx2pstfx(const std::string& inf) {
 
   return output;
 }
+
 int eval(const std::string& post) {
   TStack<int, 100> stack;
   std::istringstream in(post);
   std::string token;
+
   while (in >> token) {
     if (isdigit(token[0]) || (token[0] == '-' && token.length() > 1)) {
       stack.push(std::stoi(token));
@@ -72,8 +80,10 @@ int eval(const std::string& post) {
       stack.push(result);
     }
   }
+
   return stack.top();
 }
+
 int main() {
   std::string expr;
   std::cout << "Введите инфиксное выражение: ";
