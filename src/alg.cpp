@@ -13,41 +13,51 @@ int precedence(char op) {
 std::string infx2pstfx(const std::string& inf) {
   std::string output;
   TStack<char, 100> stack;
+  size_t i = 0;
 
-  for (size_t i = 0; i < inf.size(); ++i) {
+  while (i < inf.length()) {
     char ch = inf[i];
 
     if (isdigit(ch)) {
-      std::string number(1, ch);
-      while (i + 1 < inf.size() && isdigit(inf[i + 1])) {
-        ++i;
+      std::string number;
+      while (i < inf.length() && isdigit(inf[i])) {
         number += inf[i];
+        ++i;
       }
-      output += number + ' ';
-    } else if (ch == '(') {
+      output += number + " ";
+      continue;
+    }
+
+    if (ch == '(') {
       stack.push(ch);
     } else if (ch == ')') {
       while (!stack.isEmpty() && stack.top() != '(') {
         output += stack.top();
-        output += ' ';
+        output += " ";
         stack.pop();
       }
-      if (!stack.isEmpty()) stack.pop();
+      if (!stack.isEmpty()) stack.pop(); // remove '('
     } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
       while (!stack.isEmpty() && precedence(stack.top()) >= precedence(ch)) {
         output += stack.top();
-        output += ' ';
+        output += " ";
         stack.pop();
       }
       stack.push(ch);
     }
+
+    ++i;
   }
 
   while (!stack.isEmpty()) {
     output += stack.top();
-    output += ' ';
+    output += " ";
     stack.pop();
   }
+
+  // удалить последний пробел (если есть)
+  if (!output.empty() && output.back() == ' ')
+    output.pop_back();
 
   return output;
 }
@@ -58,7 +68,7 @@ int eval(const std::string& post) {
   std::string token;
 
   while (in >> token) {
-    if (isdigit(token[0]) || (token[0] == '-' && token.size() > 1)) {
+    if (isdigit(token[0]) || (token[0] == '-' && token.length() > 1)) {
       stack.push(std::stoi(token));
     } else {
       int b = stack.top(); stack.pop();
