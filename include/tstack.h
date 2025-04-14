@@ -1,43 +1,40 @@
 // Copyright 2021 NNTU-CS
-#ifndef INCLUDE_TSTACK_H_
-#define INCLUDE_TSTACK_H_
+#ifndef TSTACK_H
+#define TSTACK_H
 
-template <typename T, int SIZE>
+#include <stdexcept>
+
+template<typename T, int maxSize>
 class TStack {
 private:
-  T data[SIZE];
-  int top;
+  T data[maxSize];
+  int topIndex;
 
 public:
-  TStack() : top(-1) {}
+  TStack() : topIndex(-1) {}
+
+  void push(const T& value) {
+    if (isFull()) throw std::overflow_error("Stack overflow");
+    data[++topIndex] = value;
+  }
+
+  void pop() {
+    if (isEmpty()) throw std::underflow_error("Stack underflow");
+    --topIndex;
+  }
+
+  T top() const {
+    if (isEmpty()) throw std::underflow_error("Stack is empty");
+    return data[topIndex];
+  }
 
   bool isEmpty() const {
-    return top == -1;
+    return topIndex == -1;
   }
 
   bool isFull() const {
-    return top == SIZE - 1;
-  }
-
-  void push(const T& value) {
-    if (!isFull()) {
-      data[++top] = value;
-    }
-  }
-
-  T pop() {
-    if (!isEmpty()) {
-      return data[top--];
-    }
-    throw "Stack underflow!";
-  }
-
-  T peek() const {
-    if (!isEmpty()) {
-      return data[top];
-    }
-    throw "Stack is empty!";
+    return topIndex == maxSize - 1;
   }
 };
 
-#endif  // INCLUDE_TSTACK_H_
+#endif // TSTACK_H
