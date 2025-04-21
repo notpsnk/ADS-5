@@ -53,7 +53,7 @@ std::string infx2pstfx(const std::string& inf) {
 
   std::string result = out.str();
   if (!result.empty() && result.back() == ' ')
-    result.pop_back();  // убрать последний пробел
+    result.pop_back();
 
   return result;
 }
