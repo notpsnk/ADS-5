@@ -31,7 +31,7 @@ class MyStack {
   }
 
   bool empty() const {
-    return top_ < 0;
+    return top_ + 1 < 0;
   }
 
   bool full() const {
