@@ -35,7 +35,7 @@ class MyStack {
   }
 
   bool full() const {
-    return top_ >= MaxSize;
+    return top_ + 1 >= MaxSize;
   }
 
  private:
