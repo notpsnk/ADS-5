@@ -7,9 +7,9 @@ int eval(const std::string& post);
 
 int main() {
   std::string inputExpression;
-  std::string postfixForm;
 
   if (std::getline(std::cin, inputExpression)) {
+    std::string postfixForm = infx2pstfx(inputExpression);
     postfixForm = infx2pstfx(inputExpression);
     std::cout << postfixForm << std::endl;
 
