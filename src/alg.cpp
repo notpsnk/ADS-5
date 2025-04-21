@@ -38,8 +38,7 @@ std::string infx2pstfx(const std::string& inf) {
         ops.pop();
       }
       if (!ops.isEmpty()) ops.pop();
-    } else if (current == '+' || current == '-' ||
-      current == '*' || current == '/') {
+    } else if (current == '+' || current == '-' || current == '*' || current == '/') {
       while (!ops.isEmpty() && precedence(ops.top()) >= precedence(current)) {
         res += ops.top();
         res += ' ';
@@ -49,13 +48,13 @@ std::string infx2pstfx(const std::string& inf) {
     }
   }
 
-  while (!ops.isEmpty() && res.back() == ' ') {
+  while (!ops.isEmpty()) {
     res += ops.top();
     res += ' ';
     ops.pop();
   }
 
-  if (!res.empty())
+  if (!res.empty() && res.back() == ' ')
     res.pop_back();
 
   return res;
@@ -67,11 +66,13 @@ int eval(const std::string& post) {
   std::string item;
 
   while (parser >> item) {
-    if (std::isdigit(item[0] || (item[0] == '-' && item.length() > 1)) {
+    if (std::isdigit(item[0]) || (item[0] == '-' && item.length() > 1)) {
       stk.push(std::stoi(item));
     } else {
       int rhs = stk.top(); stk.pop();
       int lhs = stk.top(); stk.pop();
+      int out = 0;
+
       if (item[0] == '+') out = lhs + rhs;
       else if (item[0] == '-') out = lhs - rhs;
       else if (item[0] == '*') out = lhs * rhs;
