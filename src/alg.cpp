@@ -37,7 +37,7 @@ std::string infx2pstfx(const std::string& inf) {
         ops.pop();
       }
       if (!ops.isEmpty()) ops.pop();
-    } else if (current == '+' || current == '-' || 
+    } else if (current == '+' || current == '-' ||
       current == '*' || current == '/') {
       while (!ops.isEmpty() && precedence(ops.top()) >= precedence(current)) {
         res += ops.top();
