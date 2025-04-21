@@ -37,7 +37,8 @@ std::string infx2pstfx(const std::string& inf) {
         ops.pop();
       }
       if (!ops.isEmpty()) ops.pop();
-    } else if (current == '+' || current == '-' || current == '*' || current == '/') {
+    } else if (current == '+' || current == '-' || 
+      current == '*' || current == '/') {
       while (!ops.isEmpty() && precedence(ops.top()) >= precedence(current)) {
         res += ops.top();
         res += ' ';
@@ -70,8 +71,6 @@ int eval(const std::string& post) {
     } else {
       int rhs = stk.top(); stk.pop();
       int lhs = stk.top(); stk.pop();
-      
-
       if (item[0] == '+') out = lhs + rhs;
       else if (item[0] == '-') out = lhs - rhs;
       else if (item[0] == '*') out = lhs * rhs;
