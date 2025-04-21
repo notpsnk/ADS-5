@@ -28,6 +28,7 @@ std::string infx2pstfx(const std::string& inf) {
         ++pos;
       }
       res += val + " ";
+      --pos;
     } else if (current == '(') {
       ops.push(current);
     } else if (current == ')') {
