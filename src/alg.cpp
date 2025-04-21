@@ -11,20 +11,19 @@ int precedence(char op) {
 }
 
 std::string infx2pstfx(const std::string& inf) {
-  std::string output;
+  std::ostringstream out;
   TStack<char, 100> stack;
   size_t i = 0;
 
   while (i < inf.length()) {
     char ch = inf[i];
 
-    if (isdigit(ch)) {
-      std::string number;
-      while (i < inf.length() && isdigit(inf[i])) {
-        number += inf[i];
+    if (std::isdigit(ch)) {
+      while (i < inf.length() && std::isdigit(inf[i])) {
+        out << inf[i];
         ++i;
       }
-      output += number + " ";
+      out << ' ';
       continue;
     }
 
@@ -32,15 +31,13 @@ std::string infx2pstfx(const std::string& inf) {
       stack.add(ch);
     } else if (ch == ')') {
       while (!stack.empty() && stack.peek() != '(') {
-        output += stack.peek();
-        output += " ";
+        out << stack.peek() << ' ';
         stack.remove();
       }
       if (!stack.empty()) stack.remove();
     } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
       while (!stack.empty() && precedence(stack.peek()) >= precedence(ch)) {
-        output += stack.peek();
-        output += " ";
+        out << stack.peek() << ' ';
         stack.remove();
       }
       stack.add(ch);
@@ -50,15 +47,15 @@ std::string infx2pstfx(const std::string& inf) {
   }
 
   while (!stack.empty()) {
-    output += stack.peek();
-    output += " ";
+    out << stack.peek() << ' ';
     stack.remove();
   }
 
-  if (!output.empty() && output.back() == ' ')
-    output.pop_back();
+  std::string result = out.str();
+  if (!result.empty() && result.back() == ' ')
+    result.pop_back();  // убрать последний пробел
 
-  return output;
+  return result;
 }
 
 int eval(const std::string& post) {
