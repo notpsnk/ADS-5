@@ -49,7 +49,7 @@ std::string infx2pstfx(const std::string& inf) {
     }
   }
 
-  while (!ops.isEmpty()) {
+  while (!ops.isEmpty() && res.back() == ' ') {
     res += ops.top();
     res += ' ';
     ops.pop();
@@ -67,7 +67,7 @@ int eval(const std::string& post) {
   std::string item;
 
   while (parser >> item) {
-    if (std::isdigit(item[0])) {
+    if (std::isdigit(item[0] || (item[0] == '-' && item.length() > 1)) {
       stk.push(std::stoi(item));
     } else {
       int rhs = stk.top(); stk.pop();
