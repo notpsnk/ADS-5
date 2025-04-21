@@ -7,7 +7,7 @@
 template<typename Type, int Capacity>
 class MyStack {
  public:
-  MyStack() : top_(0) {}
+  MyStack() : top_(-1) {}
 
   void add(const Type& element) {
     if (full()) {
