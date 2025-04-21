@@ -31,7 +31,7 @@ class TStack {
   }
 
   bool empty() const {
-    return top_ + 1 < 0;
+    return top_ == -1;
   }
 
   bool full() const {
