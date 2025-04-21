@@ -5,9 +5,9 @@
 #include <stdexcept>
 
 template<typename Type, int Capacity>
-class MyStack {
+class TStack {
  public:
-  MyStack() : top_(-1) {}
+  TStack() : top_(-1) {}
 
   void add(const Type& element) {
     if (full()) {
