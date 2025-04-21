@@ -1,6 +1,6 @@
 // Copyright 2021 NNTU-CS
-#ifndef INCLUDE_MY_STACK_H_
-#define INCLUDE_MY_STACK_H_
+#ifndef INCLUDE_TSTACK_H_
+#define INCLUDE_TSTACK_H_
 
 #include <stdexcept>
 
@@ -44,4 +44,4 @@ class MyStack {
   int top_;
 };
 
-#endif
+#endif  // INCLUDE_TSTACK_H_
