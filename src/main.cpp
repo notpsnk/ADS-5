@@ -9,12 +9,9 @@ int main() {
   std::string inputExpression;
 
   if (std::getline(std::cin, inputExpression)) {
-    std::string postfixForm = infx2pstfx(inputExpression);
-    postfixForm = infx2pstfx(inputExpression);
+    auto postfixForm = infx2pstfx(inputExpression);
     std::cout << postfixForm << std::endl;
-
-    int result = eval(postfixForm);
-    std::cout << result << std::endl;
+    std::cout << eval(postfixForm) << std::endl;
   }
 
   return 0;
