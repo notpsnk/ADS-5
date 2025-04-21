@@ -11,7 +11,7 @@ int precedence(char op) {
 }
 
 std::string infx2pstfx(const std::string& inf) {
-  std::ostringstream out;
+  std::string result;
   TStack<char, 100> stack;
   size_t i = 0;
 
@@ -20,10 +20,9 @@ std::string infx2pstfx(const std::string& inf) {
 
     if (std::isdigit(ch)) {
       while (i < inf.length() && std::isdigit(inf[i])) {
-        out << inf[i];
-        ++i;
+        result += inf[i++];
       }
-      out << ' ';
+      result += ' ';
       continue;
     }
 
@@ -31,13 +30,15 @@ std::string infx2pstfx(const std::string& inf) {
       stack.add(ch);
     } else if (ch == ')') {
       while (!stack.empty() && stack.peek() != '(') {
-        out << stack.peek() << ' ';
+        result += stack.peek();
+        result += ' ';
         stack.remove();
       }
       if (!stack.empty()) stack.remove();
     } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
       while (!stack.empty() && precedence(stack.peek()) >= precedence(ch)) {
-        out << stack.peek() << ' ';
+        result += stack.peek();
+        result += ' ';
         stack.remove();
       }
       stack.add(ch);
@@ -47,11 +48,11 @@ std::string infx2pstfx(const std::string& inf) {
   }
 
   while (!stack.empty()) {
-    out << stack.peek() << ' ';
+    result += stack.peek();
+    result += ' ';
     stack.remove();
   }
 
-  std::string result = out.str();
   if (!result.empty() && result.back() == ' ')
     result.pop_back();
 
